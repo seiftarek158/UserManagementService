@@ -1,6 +1,7 @@
 package net.atos.usrmanagementservice.controller;
 
 import jakarta.validation.Valid;
+import net.atos.usrmanagementservice.dto.LoginResponseDto;
 import net.atos.usrmanagementservice.dto.UserLoginDto;
 import net.atos.usrmanagementservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,18 +22,17 @@ public class LoginController {
     UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody UserLoginDto userLoginDto) {
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody UserLoginDto userLoginDto) {
         Optional<String> token = userService.verify(userLoginDto);
-        Map<String, String> response = new HashMap<>();
         if (token.isPresent()) {
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", "Bearer " + token.get());
 
-
-            return ResponseEntity.status(200).headers(headers).body("Login successful");
+            return ResponseEntity.status(200).headers(headers).body(new LoginResponseDto(token.get(),"Login Successful","200"));
+//            return ResponseEntity.status(200).headers(headers).build();
         } else {
 
-            return ResponseEntity.status(500).body("Invalid credentials");
+            return ResponseEntity.status(500).body(new LoginResponseDto("","Login Failed","500"));
         }
     }
 
